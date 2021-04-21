@@ -12,6 +12,10 @@
             line-height: 1.4;
         }
 
+        a {
+            font-size: x-large;
+        }
+
         a:link {
             color:#00F0FF; /* this is more readable on a dark dark background and (as a bonus) looks nicer! */
         }
