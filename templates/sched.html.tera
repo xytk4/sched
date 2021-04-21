@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Schedule (Automatic)</title>
+    <style>
+        /* stolen from 15A Universal Styles */
+        body {
+            background-color:#1A1A1A;
+            color:white;
+            margin:1.3em;
+            line-height: 1.4;
+        }
+
+        a:link {
+            color:#00F0FF; /* this is more readable on a dark dark background and (as a bonus) looks nicer! */
+        }
+        a:visited {
+            color: #00F0FF;
+        }
+        a:hover {
+            color: #00F0FF;
+        }
+        a:active {
+            color: #00F0FF;
+        }
+
+        .banner {
+            background-color: #6a0f17;
+            margin: 4em;
+            padding: 1em;
+        }
+
+        .sched_day {
+            background-color: #2b3032;
+            width:65%;
+            margin: 2em;
+            padding: 1em;
+        }
+        .sched_day_tmr {
+             background-color: #357968;
+             width:50%;
+             margin: 2em;
+             padding: 1em;
+         }
+        .sched_day_datmr {
+            background-color: #5b140b;
+            /* colour theory, ignore this this is just for testing
+            background-color: #6a4823;
+            background-color: #296a33;
+            background-color: #2f6a5f;
+            background-color: #29556a;
+            background-color: #3d386a;
+            background-color: #6a3a62;
+            background-color: #6a2c32;
+            background-color: #56617a;
+            background-color: #549ac6;
+            background-color: #c68252;
+            */
+            width:50%;
+            margin: 2em;
+            padding: 1em;
+        }
+        .special {
+            background-color: rgba(60, 60, 80, 0.5);
+            margin: 0.5em;
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+            padding-top: 0.2em;
+            padding-bottom: 0.3em;
+        }
+    </style>
+</head>
+<body>
+<h2>Hello and welcome to the automatic schedule webpage.</h2>
+<h4>スケジュールのページへいらっしゃいませ‼</h4>
+<p>This is a really ridiculous thing especially since I'm only making it now. But here it is.</p>
+<p>Probably the only person who will ever use this is <b>me.</b> If not, hi!</p>
+<hr />
+
+{% if show_banner %}
+<div class="banner">
+    <h3>automatic notice: it's almost midnight, so the date is about to change. don't get confused. look at the date. thanks.</h3>
+</div>
+{% endif %}
+
+{% for block in blocks %}
+<div class="sched_day" style="background-color: {{block.bgcolorcode}}">
+    <h3>{{block.title}} ({{block.date}}) is <b>{{block.day_str}}</b>.</h3>
+
+    {% if block.is_over == true %}
+    <h4>This day has (most likely) already happened, at least in terms of school.</h4>
+    {% endif %}
+
+    {% if block.classes_is_some == true %}
+    <p>This day's classes are:</p>
+    <ol>
+        {% for class in block.classes %}
+            <li>{{class}}</li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if block.special_is_some == true %}
+    <div class="special">
+    <p><em>Special events!</em></p>
+    <ul>
+        {% for event in block.special %}
+            <li>{{event}}</li>
+        {% endfor %}
+    </ul>
+    </div>
+    {% endif %}
+    <!-- <p>I hope you have a nice day.</p> -->
+    <p>{{block.greeting}}</p>
+</div>
+{% endfor %}
+
+<a href="?count={{nextcount}}">More days, please! (click here)</a>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+</body>
+</html>
