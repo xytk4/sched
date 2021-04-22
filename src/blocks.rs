@@ -6,6 +6,7 @@ use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 
 const SPECIALS_PATH: &str = "./special.csv";
+const ONLINE_PATH:   &str = "./online.csv";
 const SCHED_CLASSES: &str = include_str!("sched_classes.csv");
 const SCHED_DATA:    &str = include_str!("sched_data.csv"   );
 
@@ -22,6 +23,7 @@ pub struct Block {
     special: Vec<String>,
     special_is_some: bool,
     is_over: bool,
+    is_online: bool,
 }
 
 impl Block {
@@ -42,7 +44,7 @@ impl Block {
         // enough for this)
         let classes_is_some= classes.is_some();
 
-        let special = get_special(&date);
+        let special = Self::get_special(&date);
         let special_is_some = special.is_some();
 
         let is_over = match &day {
@@ -79,6 +81,8 @@ impl Block {
             None => false
         };
 
+        let is_online = Self::check_online(&date);
+
         // generate struct
         Block {
             date: date.format("%A, %d-%m-%Y").to_string(),
@@ -94,7 +98,8 @@ impl Block {
             classes_is_some,
             special: special.unwrap_or_default(),
             special_is_some,
-            is_over
+            is_over,
+            is_online
         }
     }
     fn classes_from_day(day: &Day) -> Option<Vec<String>> {
@@ -169,6 +174,65 @@ impl Block {
         None
     }
 
+    fn get_special(date: &NaiveDate) -> Option<Vec<String>> {
+        let mut reader = match csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_path(SPECIALS_PATH)
+        {
+            Ok(r) => r,
+            Err(_) => return None, // right, basically this will get updated on runtime so we don't want
+            // it to die on us. so just be careful around here, use default, etc
+        };
+
+        let date_str = date.format("%d-%m-%Y").to_string();
+        let mut specials: Vec<String> = vec![];
+        for r in reader.records() {
+            let record = r.unwrap_or_default();
+            match record.get(0) {
+                Some(r) => {
+                    if r == date_str {
+                        // we good here
+                        specials
+                            .push(record.get(1)
+                                .unwrap_or("oh no! error code 1 or something idk basically I made a mistake")
+                                .to_string()
+                            )
+                    }
+                },
+                None => {}
+            }
+        }
+        if specials.len() > 0 {
+            Some(specials)
+        } else {
+            None
+        }
+    }
+
+    fn check_online(date: &NaiveDate) -> bool {
+        let mut reader = match csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_path(ONLINE_PATH)
+        {
+            Ok(r) => r,
+            Err(_) => return false, // like specials, this will get updated. assume false as much as possible
+        };
+
+        let date_str = date.format("%d-%m-%Y").to_string();
+        for r in reader.records() {
+            let record = r.unwrap_or_default();
+            match record.get(0) {
+                Some(r) => {
+                    if r == date_str {
+                        return true
+                    }
+                }
+                None => {}
+            }
+        }
+        false
+    }
+
     fn format_day(day: &Option<Day>) -> String {
         match day {
             Some(d) => match d {
@@ -233,41 +297,7 @@ impl Block {
     }
 }
 
-fn get_special(date: &NaiveDate) -> Option<Vec<String>> {
-    let mut reader = match csv::ReaderBuilder::new()
-        .has_headers(false)
-        .from_path(SPECIALS_PATH)
-    {
-        Ok(r) => r,
-        Err(_) => return None, // right, basically this will get updated on runtime so we don't want
-                               // it to die on us. so just be careful around here, use default, etc
-    };
 
-    let date_str = date.format("%d-%m-%Y").to_string();
-    let mut specials: Vec<String> = vec![];
-    for r in reader.records() {
-        let record = r.unwrap_or_default();
-        match record.get(0) {
-            Some(r) => {
-                if r == date_str {
-                    // we good here
-                    specials
-                        .push(record.get(1)
-                            .unwrap_or("oh no! error code 1 or something idk basically I made a mistake")
-                            .to_string()
-                        )
-                }
-            },
-            None => {}
-        }
-    }
-    if specials.len() > 0 {
-        Some(specials)
-    } else {
-        None
-    }
-
-}
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 enum Day {
