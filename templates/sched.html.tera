@@ -84,7 +84,7 @@
 
 {% if show_banner %}
 <div class="banner">
-    <h3>automatic notice: it's almost midnight, so the date is about to change. don't get confused. look at the date. thanks.</h3>
+    <h3>automatic notice: it's close to midnight, so the date is about to change, or maybe just did. don't get confused. look at the date. thanks.</h3>
 </div>
 {% endif %}
 
