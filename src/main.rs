@@ -1,12 +1,11 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-mod blocks;
-
 #[macro_use] extern crate rocket;
-use rocket_contrib::templates::{Template};
 
-use chrono::{Timelike, Duration};
+use chrono::{Duration, Timelike};
+use rocket_contrib::templates::Template;
 
+mod blocks;
 
 #[derive(serde::Serialize)]
 struct TemplateContext<'r> {
@@ -25,7 +24,7 @@ fn sched(count: Option<i32>) -> Template {
     // first, prevent silly nonsense like requesting a BILLION things
     match count {
         Some(c) => {
-            if c > 100 {
+            if c > 80 {
                 return Template::render("silly", &SillyTemplateContext {
                     count: &c
                 })
@@ -36,7 +35,6 @@ fn sched(count: Option<i32>) -> Template {
 
     // figure it out
     let now = chrono::Local::now();
-    let date = now.naive_local().date();
 
     let show_banner = match now.hour() {
         22 | 23 | 24 | 0 | 1 | 2 => true, // good enough for me

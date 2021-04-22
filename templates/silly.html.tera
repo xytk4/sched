@@ -23,15 +23,63 @@
         a:active {
             color: #00F0FF;
         }
+        button {
+            display: inline-block;
+            padding: 15px 25px;
+            font-size: 24px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+
+        button:hover {background-color: #3e8e41}
+
+        button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+
     </style>
+    <script>
+        function optimized_number_increase_strategy() {
+            document.getElementById("count").innerText = Number(document.getElementById("count").innerText) + 50;
+        }
+    </script>
 </head>
 <body>
 <h2>Now, if that isn't just the silliest thing you've ever done.</h2>
 <p>There is absolutely no reason at all you should need that many days on one page.</p>
 <p>Hold on... how many did you just request? Let me count.......</p>
-<h1>{{count}}.</h1>
+<h1><span id="count">{{count}}</span>.</h1>
 <h2>In no world is that necessary at all,</h2>
 <h3>so please stop it thanks</h3>
 <a href="?">Go back to being sensible</a>
+<br>
+<br>
+<br>
+<h3>Or if you want, you can just keep clicking this button, but it won't do anything but increase the number.</h3>
+<button onclick="optimized_number_increase_strategy()">Balls</button>
+
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<hr />
+<p>disclaimer: due to *reasons* the button won't work in internet explorer, i don't think. good thing no one
+   uses that anymore. disclaimer number 2 is that you're not actually refreshing the page anymore since that
+   would be a waste of server resources (this is efficient but also .. no.) so it's javascript instead. actually
+   now that I think about it some people might have js disabled;; but if you're that kind of person you probably
+   wouldn't want to press that button anyway. or you can increment the url query instead. (but don't!)</p>
+<small> - ravi ; less than three etc</small>
 </body>
 </html>

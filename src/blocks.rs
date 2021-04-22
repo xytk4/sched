@@ -1,9 +1,9 @@
 
 // Blocks
 
-use chrono::{NaiveDate, DateTime, Local, Timelike};
-use serde::{Serialize, Deserialize};
+use chrono::{DateTime, Local, NaiveDate, Timelike};
 use rand::prelude::SliceRandom;
+use serde::{Deserialize, Serialize};
 
 const SPECIALS_PATH: &str = "./special.csv";
 const SCHED_CLASSES: &str = include_str!("sched_classes.csv");
@@ -36,17 +36,48 @@ impl Block {
             Some(d) => Self::classes_from_day(d),
             None => None,
         };
+        // this needs its own variable so we can operate on it
+        // before it gets stolen by the struct to find out if
+        // it is some (since i don't think the template is smart
+        // enough for this)
         let classes_is_some= classes.is_some();
 
         let special = get_special(&date);
         let special_is_some = special.is_some();
 
-        let is_over =
-            if dt.hour() >= 16 && dt.naive_local().date() == chrono::Local::now().naive_local().date() {
-                true
-            } else {
-                false
-            }; // ??? how
+        let is_over = match &day {
+            Some(d) => {
+                match d {
+                    Day::Day1 |
+                    Day::Day2 |
+                    Day::Day3 |
+                    Day::Day4 |
+                    Day::Day5 |
+                    Day::Day6 |
+                    Day::Day7 |
+                    Day::Day8 => {
+                        if dt.hour() >= 16
+                            && dt.naive_local().date() == chrono::Local::now().naive_local().date() {
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    Day::Day9 => {
+                        if dt.hour() >= 13 // safe estimates
+                            && dt.naive_local().date() == chrono::Local::now().naive_local().date() {
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    Day::Ped |
+                    Day::Holiday |
+                    Day::Unknown => false
+                }
+            },
+            None => false
+        };
 
         // generate struct
         Block {
@@ -93,12 +124,15 @@ impl Block {
         // we have the line
         // turn it into Vec of string
         let mut t: Vec<String> = r.iter().map(|x| x.to_string()).collect();
-        for (i, item) in t.clone().iter().rev().enumerate() {
+        for item in t.clone().iter().rev() { // remove empties
+            // right it's a csv thing they all have to have the same amount of rows
+            // but we don't want blank items
             if item == &"".to_string() {
                 t.pop(); // this sounds good but COULD FAIL BE CAREFUL I'M NOT 100% SURE ON THIS ONE
+                // basically I think it just needs to be empty only at the end
+                // like we can't have empty ones in the middle or this will mess up badly
             }
         }
-
         Some(t)
     }
     fn day_from_date(now: &NaiveDate) -> Option<Day> {
@@ -146,14 +180,13 @@ impl Block {
                 Day::Day6 => "Day 6",
                 Day::Day7 => "Day 7",
                 Day::Day8 => "Day 8",
-                Day::Day9 => "Day 9",
+                Day::Day9 => "Day 9 (half day!)",
                 Day::Ped => "a Ped Day",
                 Day::Holiday => "a Holiday of Some Sort or Another IDK man Look it Up in the Calendar",
                 Day::Unknown => "unknown ???",
             }.to_string(),
             None => "no day (weekend, most likely)".to_string(),
         }
-
     }
 
     fn bgcolorcode(day: &Day) -> String {
@@ -191,7 +224,9 @@ impl Block {
             "I hope YOU specifically will have a nice day.",
             "I hope you, more than anyone else, will have a great day.",
             "I hope you have a randomly-generated day",
-            "I hope you have a day free from randomly-generated descriptions like this one"
+            "I hope you have a day free from randomly-generated descriptions like this one",
+            "I hope you have a day full of randomly-generated descriptions like this one",
+            "I wish you a wonderful wonderful day."
             // that's enough I hope
         ];
         greetings.choose(&mut rand::thread_rng()).unwrap().to_string()
@@ -212,12 +247,18 @@ fn get_special(date: &NaiveDate) -> Option<Vec<String>> {
     let mut specials: Vec<String> = vec![];
     for r in reader.records() {
         let record = r.unwrap_or_default();
-        if record.get(0).is_some() {
-            let x = record.get(0).unwrap();
-            if x == date_str {
-                // we good here
-                specials.push(record.get(1).unwrap_or("oh no! error code 1 or something idk basically I made a mistake").to_string())
-            }
+        match record.get(0) {
+            Some(r) => {
+                if r == date_str {
+                    // we good here
+                    specials
+                        .push(record.get(1)
+                            .unwrap_or("oh no! error code 1 or something idk basically I made a mistake")
+                            .to_string()
+                        )
+                }
+            },
+            None => {}
         }
     }
     if specials.len() > 0 {
