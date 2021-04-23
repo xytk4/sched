@@ -91,7 +91,11 @@ impl Block {
                 Some(d) => Self::bgcolorcode(d),
                 None => "#2b3032".to_string() // default
             },
-            greeting: if title == "Today" {"I hope you have a nice day".to_string()} else {Self::rand_greeting()},
+            greeting:   if title == "Today" {
+                            "I hope you have a nice day".to_string()
+                        } else {
+                            Self::rand_greeting()
+                        },
             day,
             day_str,
             classes: classes.unwrap_or_default(),
@@ -296,8 +300,6 @@ impl Block {
         greetings.choose(&mut rand::thread_rng()).unwrap().to_string()
     }
 }
-
-
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 enum Day {

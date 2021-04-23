@@ -79,6 +79,20 @@
             padding-top: 0.2em;
             padding-bottom: 0.3em;
         }
+        .onl {
+            animation: blink 1.2s ease infinite;
+        }
+        @keyframes blink{
+            0%{
+                opacity: 0.4;
+            }
+            50%{
+                opacity: 1;
+            }
+            100%{
+                opacity: 0.4;
+            }
+        }
     </style>
 </head>
 <body>
@@ -105,11 +119,11 @@
 <div class="sched_day" style="background-color: {{block.bgcolorcode}}">
     <h3>
         {{block.title}} ({{block.date}}) {% if block.is_over == true %} was {% else %} is {% endif %}
-        <b>{{block.day_str}}</b>{% if block.is_online == true %} ONLINE{% endif %}.
+        <b>{{block.day_str}}</b>{% if block.is_online == true %}<span class="onl"> ONLINE</span>{% endif %}.
     </h3>
 
     {% if block.is_over == true %}
-    <h4>This day has already happened, at least in terms of school.</h4>
+    <h4 class="onl">This day has already happened, at least in terms of school.</h4>
     {% endif %}
 
     {% if block.classes_is_some == true %}
