@@ -61,7 +61,7 @@ impl Block {
                     "*CANC" => {
                         // day cancelled
                         return Block {
-                            date: date.format("%A, %d-%m-%Y").to_string(),
+                            date: date.format("%A, %d-%b-%Y").to_string(),
                             title: title.to_string(),
                             bgcolorcode: "#aaaaaa".to_string(),
                             greeting:   if title == "Today" {
@@ -123,7 +123,7 @@ impl Block {
 
         // generate struct
         Block {
-            date: date.format("%A, %d-%m-%Y").to_string(),
+            date: date.format("%A, %d-%b-%Y").to_string(),
             title: title.to_string(),
             bgcolorcode: match &day {
                 Some(d) => Self::bgcolorcode(d),
