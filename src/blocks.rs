@@ -47,6 +47,45 @@ impl Block {
         let special = Self::get_special(&date);
         let special_is_some = special.is_some();
 
+        let is_online = Self::check_online(&date);
+
+
+        // stupid hack (?) to make a very clear way to cancel a day
+        // or other VERY SPECIAL EVENTS that require a whole block change
+        if special_is_some {
+            let s = special.clone().unwrap();
+            let first_spec = s.first();
+
+            match first_spec {
+                Some(c) => match c.as_str() {
+                    "*CANC" => {
+                        // day cancelled
+                        return Block {
+                            date: date.format("%A, %d-%m-%Y").to_string(),
+                            title: title.to_string(),
+                            bgcolorcode: "#aaaaaa".to_string(),
+                            greeting:   if title == "Today" {
+                                "I hope you have a nice day".to_string()
+                            } else {
+                                Self::rand_greeting()
+                            },
+                            day,
+                            day_str: "CANCELLED".to_string(),
+                            classes: vec![],
+                            classes_is_some: false,
+                            special: special.unwrap_or_default(),
+                            special_is_some: false,
+                            is_over: false,
+                            is_online
+                        }
+                    },
+                    _ => {}
+                },
+                None => {}
+            };
+        }
+
+
         let is_over = match &day {
             Some(d) => {
                 match d {
@@ -75,13 +114,12 @@ impl Block {
                     }
                     Day::Ped |
                     Day::Holiday |
-                    Day::Unknown => false
+                    Day::Unknown => false // not over, it never started
                 }
             },
             None => false
         };
 
-        let is_online = Self::check_online(&date);
 
         // generate struct
         Block {
