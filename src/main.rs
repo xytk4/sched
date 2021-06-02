@@ -2,8 +2,11 @@
 
 #[macro_use] extern crate rocket;
 
-use chrono::{Duration, Timelike};
+use chrono::{Duration, Timelike, NaiveDate, DateTime, Local, TimeZone};
 use rocket_contrib::templates::Template;
+use crate::blocks::{Block, Day};
+use serde::{Deserialize, Serialize};
+
 
 mod blocks;
 
@@ -70,6 +73,56 @@ fn sched(count: Option<i32>) -> Template {
     })
 }
 
+#[get("/api?<date>")]
+fn api(date: String) -> String {
+    let date_p = NaiveDate::parse_from_str(date.as_str(), "%d-%m-%Y");
+    let date = match date_p {
+        Ok(d) => d,
+        Err(_) => return "bad_date".to_string(),
+    };
+    let day = match Block::day_from_date(&date) {
+        Some(d) => d,
+        None => return "no_day".to_string(),
+    };
+    match day {
+        Day::Ped |
+        Day::Holiday |
+        Day::Unknown => return "no_school_day".to_string(),
+        _ => {}
+    }
+
+    let classes = blocks::Block::classes_from_day(&day).unwrap();
+    let special = blocks::Block::get_special(&date).unwrap_or_default();
+
+    // ok so we know it's a valid day with classes
+    let a = ApiBlock {
+        date: date.format("%A, %d-%b-%Y").to_string(),
+        day: blocks::Block::format_day(&Some(day)),
+        classes,
+        special,
+        is_online: blocks::Block::check_online(&date)
+    };
+
+    let j = serde_json::to_string(&a).unwrap_or("balls".to_string());
+
+    j
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ApiBlock {
+    date: String,
+    day: String,
+    classes: Vec<String>,
+    special: Vec<String>,
+    is_online: bool
+}
+
+#[get("/api")]
+fn api_help() -> String {
+    "api for sched. i'll write docs later.".to_string()
+}
+
+
 fn main() {
-    rocket::ignite().mount("/", routes![sched]).attach(Template::fairing()).launch();
+    rocket::ignite().mount("/", routes![sched, api, api_help]).attach(Template::fairing()).launch();
 }

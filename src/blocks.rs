@@ -144,7 +144,7 @@ impl Block {
             is_online
         }
     }
-    fn classes_from_day(day: &Day) -> Option<Vec<String>> {
+    pub fn classes_from_day(day: &Day) -> Option<Vec<String>> {
         match day {
             Day::Ped |
             Day::Holiday |
@@ -182,7 +182,7 @@ impl Block {
         }
         Some(t)
     }
-    fn day_from_date(now: &NaiveDate) -> Option<Day> {
+    pub fn day_from_date(now: &NaiveDate) -> Option<Day> {
         let now_str = now.format("%d-%m-%Y").to_string();
         let mut reader = csv::Reader::from_reader(SCHED_DATA.as_bytes());
         for r in reader.records() {
@@ -216,7 +216,7 @@ impl Block {
         None
     }
 
-    fn get_special(date: &NaiveDate) -> Option<Vec<String>> {
+    pub fn get_special(date: &NaiveDate) -> Option<Vec<String>> {
         let mut reader = match csv::ReaderBuilder::new()
             .has_headers(false)
             .from_path(SPECIALS_PATH)
@@ -251,7 +251,7 @@ impl Block {
         }
     }
 
-    fn check_online(date: &NaiveDate) -> bool {
+    pub fn check_online(date: &NaiveDate) -> bool {
         let mut reader = match csv::ReaderBuilder::new()
             .has_headers(false)
             .from_path(ONLINE_PATH)
@@ -275,7 +275,7 @@ impl Block {
         false
     }
 
-    fn format_day(day: &Option<Day>) -> String {
+    pub fn format_day(day: &Option<Day>) -> String {
         match day {
             Some(d) => match d {
                 Day::Day1 => "Day 1",
@@ -340,7 +340,7 @@ impl Block {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-enum Day {
+pub enum Day {
     Day1,
     Day2,
     Day3,
