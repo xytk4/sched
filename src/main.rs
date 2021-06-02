@@ -75,11 +75,17 @@ fn sched(count: Option<i32>) -> Template {
 
 #[get("/api?<date>")]
 fn api(date: String) -> String {
-    let date_p = NaiveDate::parse_from_str(date.as_str(), "%d-%m-%Y");
-    let date = match date_p {
-        Ok(d) => d,
-        Err(_) => return "bad_date".to_string(),
+    let date = if date == "now" {
+        // lazy
+        chrono::Local::now().naive_local().date()
+    } else {
+        let date_p = NaiveDate::parse_from_str(date.as_str(), "%d-%m-%Y");
+        match date_p {
+            Ok(d) => d,
+            Err(_) => return "bad_date".to_string(),
+        }
     };
+
     let day = match Block::day_from_date(&date) {
         Some(d) => d,
         None => return "no_day".to_string(),
