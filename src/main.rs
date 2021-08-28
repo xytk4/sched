@@ -5,16 +5,20 @@
 use chrono::{Duration, Timelike, NaiveDate, DateTime, Local, TimeZone};
 use rocket_contrib::templates::Template;
 use crate::blocks::{Block, Day};
+use crate::stat::*;
 use serde::{Deserialize, Serialize};
 
-
 mod blocks;
+mod stat;
 
 #[derive(serde::Serialize)]
 struct TemplateContext<'r> {
     blocks: &'r Vec<blocks::Block>,
+    stat: &'r Stat,
     show_banner: &'r bool,
     nextcount: &'r i32,
+    benchmark_duration_ms: &'r f64,
+    benchmark_stat_pct: &'r f64
 }
 
 #[derive(serde::Serialize)]
@@ -35,6 +39,8 @@ fn sched(count: Option<i32>) -> Template {
         }
         None => {}
     }
+
+    let benchmark_dt_start = chrono::Local::now();
 
     // figure it out
     let now = chrono::Local::now();
@@ -62,14 +68,25 @@ fn sched(count: Option<i32>) -> Template {
         None => {}
     }
 
+    let benchmark_dt_end = chrono::Local::now();
+    let benchmark_duration = benchmark_dt_end - benchmark_dt_start;
+    let benchmark_duration_ms = (benchmark_duration.num_microseconds().unwrap() as f64 / 1000.0) + 0.5;
+
+    let s = generate_stat(now);
+
+    let benchmark_stat_pct = &s.time_ms / benchmark_duration_ms * 100.0;
+
     // render
     Template::render("sched", &TemplateContext {
         blocks: &bks,
+        stat: &s,
         show_banner: &show_banner,
         nextcount: &match count {
             Some(c) => c + 7,
             None => 10,
         },
+        benchmark_duration_ms: &benchmark_duration_ms,
+        benchmark_stat_pct: &benchmark_stat_pct
     })
 }
 

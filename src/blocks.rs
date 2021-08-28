@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 const SPECIALS_PATH: &str = "./special.csv";
 const ONLINE_PATH:   &str = "./online.csv";
 const SCHED_CLASSES: &str = include_str!("sched_classes.csv");
-const SCHED_DATA:    &str = include_str!("sched_data.csv"   );
+const SCHED_DATA:    &str = include_str!("sched_data_11.csv");
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Block {
@@ -23,7 +23,7 @@ pub struct Block {
     special: Vec<String>,
     special_is_some: bool,
     is_over: bool,
-    is_online: bool,
+    //is_online: bool,
 }
 
 impl Block {
@@ -42,12 +42,12 @@ impl Block {
         // before it gets stolen by the struct to find out if
         // it is some (since i don't think the template is smart
         // enough for this)
-        let classes_is_some= classes.is_some();
+        let classes_is_some = classes.is_some();
 
         let special = Self::get_special(&date);
         let special_is_some = special.is_some();
 
-        let is_online = Self::check_online(&date);
+        //let is_online = Self::check_online(&date);
 
 
         // stupid hack (?) to make a very clear way to cancel a day
@@ -76,7 +76,7 @@ impl Block {
                             special: special.unwrap_or_default(),
                             special_is_some: false,
                             is_over: false,
-                            is_online
+                            //is_online
                         }
                     },
                     _ => {}
@@ -114,6 +114,8 @@ impl Block {
                     }
                     Day::Ped |
                     Day::Holiday |
+                    Day::HolidayDontCount |
+                    Day::Weekend |
                     Day::Unknown => false // not over, it never started
                 }
             },
@@ -141,13 +143,15 @@ impl Block {
             special: special.unwrap_or_default(),
             special_is_some,
             is_over,
-            is_online
+            //is_online
         }
     }
     pub fn classes_from_day(day: &Day) -> Option<Vec<String>> {
         match day {
             Day::Ped |
             Day::Holiday |
+            Day::HolidayDontCount |
+            Day::Weekend |
             Day::Unknown => {
                 return None;
             }
@@ -195,7 +199,7 @@ impl Block {
                         // it's included in the binary and i'm not about to change it for now
                         // so we can assume stuff like "if there's a value at 0, there will FOR
                         // SURE be one at index 1" stuff like that
-                        match record.get(1).unwrap() {
+                        match record.get(1).expect("corrupt sched csv or sum idk").trim() {
                             "1" => Day::Day1,
                             "2" => Day::Day2,
                             "3" => Day::Day3,
@@ -207,6 +211,8 @@ impl Block {
                             "9" => Day::Day9,
                             "P" => Day::Ped,
                             "C" => Day::Holiday,
+                            "D" => Day::HolidayDontCount,
+                            "W" => Day::Weekend,
                             _ => Day::Unknown,
                         }
                     );
@@ -251,6 +257,9 @@ impl Block {
         }
     }
 
+    // i want to remove this so bad. i commented all usages out
+    // (ao Fri 27-Aug-2021 09:32 PM) but i'll leave the function etc here.
+    // just in case.
     pub fn check_online(date: &NaiveDate) -> bool {
         let mut reader = match csv::ReaderBuilder::new()
             .has_headers(false)
@@ -288,10 +297,12 @@ impl Block {
                 Day::Day8 => "Day 8",
                 Day::Day9 => "Day 9 (half day!)",
                 Day::Ped => "a Ped Day",
-                Day::Holiday => "a Holiday of Some Sort or Another IDK man Look it Up in the Calendar",
+                Day::Holiday | Day::HolidayDontCount
+                    => "a Holiday of Some Sort or Another IDK man Look it Up in the Calendar",
+                Day::Weekend => "the weekend",
                 Day::Unknown => "unknown ???",
             }.to_string(),
-            None => "no day (weekend, most likely)".to_string(),
+            None => "no day (this is probably an error!!)".to_string(),
         }
     }
 
@@ -308,8 +319,9 @@ impl Block {
             Day::Day9 => "#56617a",
 
             Day::Ped => "#549ac6",
-            Day::Holiday => "#c68252",
-            Day::Unknown => "#2b3032",
+            Day::Holiday | Day::HolidayDontCount => "#c68252",
+            Day::Weekend => "#2b3032",
+            Day::Unknown => "#FF0000", // should never see this
         }.to_string()
     }
 
@@ -352,5 +364,7 @@ pub enum Day {
     Day9,
     Ped,
     Holiday,
+    HolidayDontCount,
+    Weekend,
     Unknown
 }

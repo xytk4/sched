@@ -43,7 +43,7 @@
 
         .sched_day {
             background-color: #2b3032;
-            width:65%;
+            width:75%;
             margin: 2em;
             padding: 1em;
         }
@@ -96,22 +96,19 @@
     </style>
 </head>
 <body>
-<h2>Hello and welcome to the automatic schedule webpage.</h2>
+<h2>Hello and welcome to the automatic schedule webpage. (2021-22 !!!!!)</h2>
 <h4>スケジュールのページへいらっしゃいませ‼</h4>
 <div class="text">
-<p>This is a really ridiculous thing especially since I'm only making it now. But here it is.</p>
-<p>Probably the only person who will ever use this is <b>me.</b> If not, hi!</p>
-<p>Brief explanation just in case: this page automatically calculates what "day" it will be on any given date, then looks
-   up what the schedule will look like on that day. Also, if there is anything happening I will probably
-    mark it as a "special event". That's all there is to it. Also now it tells you which days are online (but only
-    as far as we know, so like until the end of the month usually..) Anyway, this is the thing. Here it is. Right here. See:
-</p>
+    <b>Brief statistics section:</b><br/>
+    Days remaining in the school year: {{stat.days_rem}} (that's {{stat.days_rem_pct}}% done)<br/>
+    Ped days / holidays (excluding christmas etc) remaining: {{stat.ped_rem}} ({{stat.ped_past}} already happened)<br/>
+    That's it, have a nice day! <i> (calculated in {{stat.time_ms}}ms) </i>
 </div>
 <hr />
 
 {% if show_banner %}
 <div class="banner">
-    <h3>automatic notice: it's close to midnight, so the date is about to change, or maybe just did. don't get confused. look at the date. thanks.</h3>
+    <h3>automatic notice: it's close to the start/end of the day, so the date is about to change, or maybe just did. don't get confused. look at the date. thanks.</h3>
 </div>
 {% endif %}
 
@@ -119,7 +116,7 @@
 <div class="sched_day" style="background-color: {{block.bgcolorcode}}">
     <h3>
         {{block.title}} ({{block.date}}) {% if block.is_over == true %} was {% else %} is {% endif %}
-        <b>{{block.day_str}}</b>{% if block.is_online == true %}<span class="onl"> ONLINE</span>{% endif %}.
+        <b>{{block.day_str}}</b>{# {% if block.is_online == true %}<span class="onl"> ONLINE</span>{% endif %} #}.
     </h3>
 
     {% if block.is_over == true %}
@@ -152,6 +149,8 @@
 
 <a href="?count={{nextcount}}">More days, please! (click here)</a>
 <br />
+<br />
+<p>bonus points: this page was generated in <i>{{benchmark_duration_ms}}ms.</i> ({{benchmark_stat_pct}}% of that is generating top stats)</p>
 <br />
 <br />
 <br />
