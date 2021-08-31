@@ -18,7 +18,7 @@ struct TemplateContext<'r> {
     show_banner: &'r bool,
     nextcount: &'r i32,
     benchmark_duration_ms: &'r f64,
-    benchmark_stat_pct: &'r f64
+    benchmark_stat_pct: &'r String
 }
 
 #[derive(serde::Serialize)]
@@ -86,7 +86,7 @@ fn sched(count: Option<i32>) -> Template {
             None => 10,
         },
         benchmark_duration_ms: &benchmark_duration_ms,
-        benchmark_stat_pct: &benchmark_stat_pct
+        benchmark_stat_pct: &format!("{:.3}", benchmark_stat_pct)
     })
 }
 

@@ -158,7 +158,7 @@ impl Block {
             _ => {}
         }
 
-        let mut reader = csv::Reader::from_reader(SCHED_CLASSES.as_bytes());
+        let mut reader = csv::ReaderBuilder::new().has_headers(false).from_reader(SCHED_CLASSES.as_bytes());
 
         let r = reader.records().nth(match day {
             Day::Day1 => 0,
@@ -298,7 +298,7 @@ impl Block {
                 Day::Day9 => "Day 9 (half day!)",
                 Day::Ped => "a Ped Day",
                 Day::Holiday | Day::HolidayDontCount
-                    => "a Holiday of Some Sort or Another IDK man Look it Up in the Calendar",
+                    => "a Holiday of Some Sort, idk look it up in the calendar",
                 Day::Weekend => "the weekend",
                 Day::Unknown => "unknown ???",
             }.to_string(),
@@ -308,7 +308,7 @@ impl Block {
 
     fn bgcolorcode(day: &Day) -> String {
         match day {
-            Day::Day1 => "#5b140b",
+            Day::Day1 => "#ad253e", //"#5b140b",
             Day::Day2 => "#6a4823",
             Day::Day3 => "#296a33",
             Day::Day4 => "#2f6a5f",
@@ -333,7 +333,7 @@ impl Block {
             "I hope you have an exciting day.",
             "I hope you have an especially pleasant day.",
             "I especially hope you'll have a nice day.",
-            "I especially hope you'll have a pleasant day",
+            "I especially hope you'll have a pleasant day.",
             "I hope you'll have a pleasant day.",
             "I hope you'll have a relaxing day.",
             "I hope you'll have an extremely fun day.",
@@ -341,10 +341,11 @@ impl Block {
             "I hope you have an awesome day.",
             "I hope YOU specifically will have a nice day.",
             "I hope you, more than anyone else, will have a great day.",
-            "I hope you have a randomly-generated day",
-            "I hope you have a day free from randomly-generated descriptions like this one",
-            "I hope you have a day full of randomly-generated descriptions like this one",
-            "I wish you a wonderful wonderful day."
+            "I hope you have a randomly-generated day.",
+            "I hope you have a day free from randomly-generated descriptions like this one.",
+            "I hope you have a day full of randomly-generated descriptions like this one.",
+            "I wish you a wonderful wonderful day.",
+            "I hope you'll have a reasonably normal day.",
             // that's enough I hope
         ];
         greetings.choose(&mut rand::thread_rng()).unwrap().to_string()
@@ -353,15 +354,15 @@ impl Block {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum Day {
-    Day1,
-    Day2,
-    Day3,
-    Day4,
-    Day5,
-    Day6,
-    Day7,
-    Day8,
-    Day9,
+    Day1 = 0,
+    Day2 = 1,
+    Day3 = 2,
+    Day4 = 3,
+    Day5 = 4,
+    Day6 = 5,
+    Day7 = 6,
+    Day8 = 7,
+    Day9 = 8,
     Ped,
     Holiday,
     HolidayDontCount,
