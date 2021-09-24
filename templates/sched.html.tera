@@ -101,16 +101,15 @@
     </style>
 </head>
 <body>
-<h2>Hello and welcome to the automatic schedule webpage. (version 2!)</h2>
+<h2>Hello and welcome to the automatic schedule webpage!</h2>
 <h4>スケジュールのページへいらっしゃいませ‼</h4>
 <div class="text">
     <b>Brief statistics section:</b><br/>
     <span class="bleh">Days remaining in the school year:</span> {{stat.days_rem}} <span class="bleh">(that's </span>{{stat.days_rem_pct}}% <span class="bleh">complete)<br/>
-    Ped days / holidays (excluding christmas etc) remaining: </span>{{stat.ped_rem}} <span class="bleh">(</span>{{stat.ped_past}} <span class="bleh">already happened)</span><br/>
+    Ped / holidays (excluding christmas etc) remaining: </span>{{stat.ped_rem}} <span class="bleh">(</span>{{stat.ped_past}} <span class="bleh">already happened)</span><br/>
     That's it, have a nice day! <i> (calculated in {{stat.time_ms}}ms) </i><br/>
     <br/>
-    (one more thing - i have done my best to make sure everything is accurate, however maybe it isn't (especially this early in the year.)
-    you never know. unless you do, in which case please let ME know. etc.)
+    (one more thing - if there is a mistake / something that should be added ; just message me on discord or something and i'll fix it.)
 </div>
 <hr />
 
@@ -155,11 +154,11 @@
 </div>
 {% endfor %}
 
-<a href="?count={{nextcount}}">More days, please! (click here)</a>
+<a href="?count={{nextcount}}">Click here to load more days!</a>
 <br />
 <br />
 <p>bonus points: this page was generated in <i>{{benchmark_duration_ms}}ms.</i> ({{benchmark_stat_pct}}% of that is generating top stats)</p>
-<em>stupid webapp created with less than three</em>
+<em>thanks for checking in!, we (the web server) look forward to your next visit</em>
 <br />
 <br />
 <br />
