@@ -79,6 +79,24 @@ impl Block {
                             //is_online
                         }
                     },
+                    "*CANCSNOW" => {
+                        // day cancelled (snow day)
+                        // ... just in case.
+                        return Block {
+                            date: date.format("%A, %d-%b-%Y").to_string(),
+                            title: title.to_string(),
+                            bgcolorcode: "#bf6565".to_string(),
+                            greeting: "I hope you have a nice day".to_string(),
+                            day,
+                            day_str: "Snow day!".to_string(),
+                            classes: vec![],
+                            classes_is_some: false,
+                            special: special.unwrap_or_default(),
+                            special_is_some: false,
+                            is_over: false,
+                            //is_online
+                        }
+                    },
                     _ => {}
                 },
                 None => {}

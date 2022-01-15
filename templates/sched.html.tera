@@ -23,7 +23,7 @@
             color: #00F0FF;
         }
         a:hover {
-            color: #00F0FF;
+            color: #ffffff;
         }
         a:active {
             color: #00F0FF;
@@ -40,6 +40,13 @@
             background-color: #6a0f17;
             margin: 4em;
             padding: 1em;
+        }
+
+        .zzbanner {
+            background-color: #2554C7 ;
+            margin: 4em;
+            padding: 1em;
+            height:2.5em;
         }
 
         .sched_day {
@@ -109,13 +116,22 @@
     Ped / holidays (excluding christmas etc) remaining: </span>{{stat.ped_rem}} <span class="bleh">(</span>{{stat.ped_past}} <span class="bleh">already happened)</span><br/>
     That's it, have a nice day! <i> (calculated in {{stat.time_ms}}ms) </i><br/>
     <br/>
-    (one more thing - if there is a mistake / something that should be added ; just message me on discord or something and i'll fix it.)
+    (1 more thing - if there is a mistake / something that should be added ; just lmk and i'll fix it.)
 </div>
 <hr />
 
-{% if show_banner %}
+{% if show_banner == 1 %}
 <div class="banner">
     <h3>automatic notice: it's close to the start/end of the day, so the date is about to change, or maybe just did. don't get confused. look at the date. thanks.</h3>
+</div>
+{% endif %}
+
+{% if show_banner == 2 %}
+<div class="zzbanner">
+    <img height="40px" src="https://101011010.com/schedimg/zzz.gif" alt="(zzz)"/>
+    <h3 style="display:inline-block; top:50%; transform: translateY(-50%);">
+        auto notice: it's pretty late. you should probably get some sleep. thanks for checking the schedule though :) now gn.
+    </h3>
 </div>
 {% endif %}
 
@@ -158,7 +174,7 @@
 <br />
 <br />
 <p>bonus points: this page was generated in <i>{{benchmark_duration_ms}}ms.</i> ({{benchmark_stat_pct}}% of that is generating top stats)</p>
-<em>thanks for checking in!, we (the web server) look forward to your next visit</em>
+<em>thanks for checking in! ur awesome</em>
 <br />
 <br />
 <br />

@@ -15,7 +15,7 @@ mod stat;
 struct TemplateContext<'r> {
     blocks: &'r Vec<blocks::Block>,
     stat: &'r Stat,
-    show_banner: &'r bool,
+    show_banner: &'r i32,
     nextcount: &'r i32,
     benchmark_duration_ms: &'r f64,
     benchmark_stat_pct: &'r String
@@ -45,10 +45,26 @@ fn sched(count: Option<i32>) -> Template {
     // figure it out
     let now = chrono::Local::now();
 
-    let show_banner = match now.hour() {
+    /*let show_banner = match now.hour() {
         22 | 23 | 24 | 0 | 1 | 2 => true, // good enough for me
         _ => false,
+    };*/
+
+    let show_banner = match now.hour() {
+        // BANNER TYPES: 0 none | 1 date | 2 zzz
+        // this should be an enum but
+        22 | 23 | 24 | 0 => 1,
+        1 => {
+            if now.minute() > 29 {
+                2
+            } else {
+                1
+            }
+        },
+        2 | 3 | 4 => 2,
+        _ => 0,
     };
+
 
     let mut bks= vec![
         blocks::Block::generate(now, "Today"),
