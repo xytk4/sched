@@ -13,9 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Install minimal nightly
+      uses: actions-rs/toolchain@v1
       with:
-            toolchain: nightly
-            override: true
+        profile: minimal
+        toolchain: nightly
     - name: Build
       run: cargo build --verbose
