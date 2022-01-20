@@ -163,5 +163,10 @@ fn api_help() -> String {
 
 
 fn main() {
-    rocket::ignite().mount("/", routes![sched, api, api_help]).attach(Template::fairing()).launch();
+    rocket::ignite()
+        .mount("/", routes![sched, api, api_help])
+        .attach(Template::custom(|engines| {
+            engines.tera.autoescape_on(vec![]) // probably secure :)
+        }))
+        .launch();
 }

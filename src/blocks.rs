@@ -65,7 +65,7 @@ impl Block {
                             title: title.to_string(),
                             bgcolorcode: "#aaaaaa".to_string(),
                             greeting:   if title == "Today" {
-                                "I hope you have a nice day".to_string()
+                                "I hope you have a nice day.".to_string()
                             } else {
                                 Self::rand_greeting()
                             },
@@ -86,7 +86,7 @@ impl Block {
                             date: date.format("%A, %d-%b-%Y").to_string(),
                             title: title.to_string(),
                             bgcolorcode: "#bf6565".to_string(),
-                            greeting: "I hope you have a nice day".to_string(),
+                            greeting: "I hope you have a nice day.".to_string(),
                             day,
                             day_str: "Snow day!".to_string(),
                             classes: vec![],
@@ -150,7 +150,7 @@ impl Block {
                 None => "#2b3032".to_string() // default
             },
             greeting:   if title == "Today" {
-                            "I hope you have a nice day".to_string()
+                            "I hope you have a nice day.".to_string()
                         } else {
                             Self::rand_greeting()
                         },
@@ -350,20 +350,26 @@ impl Block {
             "I hope you have an incredible day.",
             "I hope you have an exciting day.",
             "I hope you have an especially pleasant day.",
-            "I especially hope you'll have a nice day.",
-            "I especially hope you'll have a pleasant day.",
-            "I hope you'll have a pleasant day.",
-            "I hope you'll have a relaxing day.",
-            "I hope you'll have an extremely fun day.",
+            "I especially hope you will have a nice day.",
+            "I especially hope you will have a pleasant day.",
+            "I hope you will have a pleasant day.",
+            "I hope you will have a relaxing day.",
+            "I hope you will have an extremely fun day.",
             //"I hope I won't run out of randomly-generated messages to put here",
             "I hope you have an awesome day.",
             "I hope YOU specifically will have a nice day.",
             "I hope you, more than anyone else, will have a great day.",
             "I hope you have a randomly-generated day.",
-            "I hope you have a day free from randomly-generated descriptions like this one.",
-            "I hope you have a day full of randomly-generated descriptions like this one.",
+            //"I hope you have a day free from randomly-generated descriptions like this one.",
+            //"I hope you have a day full of randomly-generated descriptions like this one.",
             "I wish you a wonderful wonderful day.",
-            "I hope you'll have a reasonably normal day.",
+            "I hope you will have a reasonably normal day.",
+            "I hope you won't have a bad day.",
+            "I hope you excel academically today.",
+            "I hope you will have a very unpredictable day.",
+            "I hope you will have a very predictable day.",
+            "J'espère que vous passerez une journée extraordinaire.",
+            "今日、がんばってね"
             // that's enough I hope
         ];
         greetings.choose(&mut rand::thread_rng()).unwrap().to_string()

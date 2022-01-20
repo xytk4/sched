@@ -7,9 +7,11 @@
         /* stolen from 15A Universal Styles */
         body {
             background-color:#1A1A1A;
+            background-image: url("https://www.101011010.com/img/bg_tile_1.gif");
             color:white;
-            margin:1.3em;
+            margin:16px;
             line-height: 1.4;
+            /* font-family: "MS PGothic", serif, enable_if_you_want; */
         }
 
         a {
@@ -36,25 +38,46 @@
             text-justify: newspaper;
         }
 
+        :root {
+            --margin-left: 48px;
+            --margin-top: 28px;
+            --block-width: 796px;
+        }
+
         .banner {
-            background-color: #6a0f17;
-            margin: 4em;
-            padding: 1em;
+            width:75%;
+            background-color: #931d1d;
+            padding: 16px;
+            margin-left: var(--margin-left);
+            margin-top: var(--margin-top);
+            max-width: var(--block-width);
+            border-color: #444444;
+            border-width: 2px;
+            border-style: ridge;
         }
 
         .zzbanner {
+            width:75%;
             background-color: #2554C7 ;
-            margin: 4em;
-            padding: 1em;
-            height:2.5em;
+            padding: 16px;
+            margin-left: var(--margin-left);
+            margin-top: var(--margin-top);
+            max-width: var(--block-width);
+            border-color: #444444;
+            border-width: 2px;
+            border-style: ridge;
         }
 
-        .sched_day {
+        .block {
             background-color: #2b3032;
             width:75%;
-            max-width: 800px;
-            margin: 2em;
-            padding: 1em;
+            padding: 16px;
+            margin-left: var(--margin-left);
+            margin-top: var(--margin-top);
+            max-width: var(--block-width);
+            border-color: #444444;
+            border-width: 2px;
+            border-style: ridge;
         }
         .sched_day_tmr {
              background-color: #357968;
@@ -105,6 +128,9 @@
         .bleh {
             color:#999999;
         }
+        .greeting {
+            opacity: 75%;
+        }
     </style>
 </head>
 <body>
@@ -118,7 +144,8 @@
     <br/>
     (1 more thing - if there is a mistake / something that should be added ; just lmk and i'll fix it.)
 </div>
-<hr />
+
+
 
 {% if show_banner == 1 %}
 <div class="banner">
@@ -128,15 +155,19 @@
 
 {% if show_banner == 2 %}
 <div class="zzbanner">
-    <img height="40px" src="https://101011010.com/schedimg/zzz.gif" alt="(zzz)"/>
-    <h3 style="display:inline-block; top:50%; transform: translateY(-50%);">
-        auto notice: it's pretty late. you should probably get some sleep. thanks for checking the schedule though :) now gn.
-    </h3>
+    <table width="100%" border="0" cellspacing="4" cellpadding="4">
+        <tr>
+            <td><img height="40px" src="https://101011010.com/schedimg/zzz.gif" alt="(zzz)"/></td>
+            <td><h3 >
+                notice: it's pretty late. you should probably get some sleep. thanks for checking the schedule though :) now gn.
+            </h3></td>
+        </tr>
+    </table>
 </div>
 {% endif %}
 
 {% for block in blocks %}
-<div class="sched_day" style="background-color: {{block.bgcolorcode}}">
+<div class="block" style="background-color: {{block.bgcolorcode}}">
     <h3>
         {{block.title}} ({{block.date}}) {% if block.is_over == true %} was {% else %} is {% endif %}
         <b>{{block.day_str}}</b>{# {% if block.is_online == true %}<span class="onl"> ONLINE</span>{% endif %} #}.
@@ -165,12 +196,15 @@
     </ul>
     </div>
     {% endif %}
-    <!-- <p>I hope you have a nice day.</p> -->
-    <p>{{block.greeting}}</p>
+    <p class="greeting">{{block.greeting}}</p>
 </div>
 {% endfor %}
 
-<a href="?count={{nextcount}}">Click here to load more days!</a>
+<br />
+<br />
+<br />
+
+<a class="nexta" href="?count={{nextcount}}">Click here to load more days!</a>
 <br />
 <br />
 <p>bonus points: this page was generated in <i>{{benchmark_duration_ms}}ms.</i> ({{benchmark_stat_pct}}% of that is generating top stats)</p>
