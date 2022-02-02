@@ -131,7 +131,7 @@
         .greeting {
             opacity: 75%;
         }
-        .li:nth-child(5) {
+        li:nth-child(5) {
             opacity: 56.666%;
         }
     </style>
