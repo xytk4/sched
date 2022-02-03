@@ -4,129 +4,127 @@
     <meta charset="UTF-8">
     <title>Schedule (Automatic)</title>
     <style>
-        /* stolen from 15A Universal Styles */
+        /* github.com/xytk4/sched */
         body {
             background-color:#1A1A1A;
-            background-image: url("https://www.101011010.com/img/bg_tile_1.gif");
-            color:white;
+            background-image:url(https://www.101011010.com/img/bg_tile_1.gif);
+            background-repeat: repeat;
+            color:#fff;
             margin:16px;
-            line-height: 1.4;
-            /* font-family: "MS PGothic", serif, enable_if_you_want; */
+            line-height:1.4;
         }
 
         a.nexta {
-            font-size: x-large;
+            font-size:x-large;
         }
 
-        a.heading{
-            text-decoration: none;
+        a.heading {
+            text-decoration:none;
         }
+
         a.heading:active {
-            text-decoration: none;
-            color: #ff6f00;
+            text-decoration:none;
+            color:#ff6f00;
         }
 
         a:link {
-            color:#00F0FF; /* this is more readable on a dark dark background and (as a bonus) looks nicer! */
+            color:#00F0FF;
         }
+
         a:visited {
-            color: #00F0FF;
+            color:#00F0FF;
         }
+
         a:hover {
-            color: #ffffff;
+            color:#fff;
         }
+
         a:active {
-            color: #00F0FF;
+            color:#00F0FF;
         }
 
         .text {
-            /* width: 80%; */
-            max-width: 800px;
-            text-align: justify;
-            text-justify: newspaper;
+            max-width:800px;
+            text-align:justify;
+            text-justify:newspaper;
         }
 
         :root {
-            --margin-left: 48px;
-            --margin-top: 28px;
-            --block-width: 796px;
+            --margin-left:48px;
+            --margin-top:28px;
+            --block-width:796px;
         }
 
         .banner {
             width:75%;
-            background-color: #931d1d;
-            padding: 16px;
-            margin-left: var(--margin-left);
-            margin-top: var(--margin-top);
-            max-width: var(--block-width);
-            border-color: #444444;
-            border-width: 2px;
-            border-style: ridge;
+            background-color:#931d1d;
+            padding:16px;
+            margin-left:var(--margin-left);
+            margin-top:var(--margin-top);
+            max-width:var(--block-width);
+            border-color:#444;
+            border-width:2px;
+            border-style:ridge;
         }
 
         .zzbanner {
-            background-color: #2554C7 !important;
+            background-color:#2554C7!important;
         }
 
         .block {
-            background-color: #2b3032;
+            background-color:#2b3032;
             width:75%;
-            padding: 16px;
-            margin-left: var(--margin-left);
-            margin-top: var(--margin-top);
-            max-width: var(--block-width);
-            border-color: #444444;
-            border-width: 2px;
-            border-style: ridge;
+            padding:16px;
+            margin-left:var(--margin-left);
+            margin-top:var(--margin-top);
+            max-width:var(--block-width);
+            border-color:#444;
+            border-width:2px;
+            border-style:ridge;
         }
-        .sched_day_tmr {
-            background-color: #357968;
-            width:50%;
-            margin: 2em;
-            padding: 1em;
-        }
-        .sched_day_datmr {
-            background-color: #5b140b;
-            width:50%;
-            margin: 2em;
-            padding: 1em;
-        }
+
         .special {
-            background-color: rgba(60, 60, 80, 0.5);
-            margin: 0.5em;
-            padding-left: 0.5em;
-            padding-right: 0.5em;
-            padding-top: 0.2em;
-            padding-bottom: 0.3em;
+            background-color:rgba(60,60,80,0.5);
+            margin:.5em;
+            padding:.2em .5em .3em;
         }
+
         .onl {
-            animation: blink 1.2s ease infinite;
+            animation:blink 1.2s ease infinite;
         }
-        @keyframes blink{
-            0%{
-                opacity: 1;
+
+        @keyframes blink {
+            0% {
+                opacity:1;
             }
-            50%{
-                opacity: 0.4;
+
+            50% {
+                opacity:.4;
             }
-            100%{
-                opacity: 1;
+
+            100% {
+                opacity:1;
             }
         }
+
         .bleh {
-            color:#999999;
+            color:#999;
         }
+
         .greeting {
-            opacity: 75%;
+            opacity:75%;
         }
+
         li:nth-child(5) {
-            opacity: 56.666%;
+            opacity:56.666%;
         }
+
         .toki {
-            float: right;
+            float:right;
         }
+
         ol {
-            width: 38%;
+            width:45%;
         }
     </style>
 
@@ -154,50 +152,43 @@
 <div class="text">
     <b>Brief statistics section:</b><br/>
     <span class="bleh">Days remaining in the school year:</span> {{stat.days_rem}} <span class="bleh">(that's </span>{{stat.days_rem_pct}}% <span class="bleh">complete)<br/>
-    Ped / holidays (excluding christmas etc) remaining: </span>{{stat.ped_rem}} <span class="bleh">(</span>{{stat.ped_past}} <span class="bleh">already happened)</span><br/>
+    Ped days / holidays remaining: </span>{{stat.ped_rem}} <span class="bleh">(</span>{{stat.ped_past}} <span class="bleh">have happened already)</span><br/>
     That's it, have a nice day! <i> (calculated in {{stat.time_ms}}ms) </i><br/>
     <br/>
     (1 more thing - if there is a mistake / something that should be added ; just lmk and i'll fix it.)
 </div>
-
-
-
-{% if show_banner == 1 %}
+{% if show_banner == 1 -%}
 <div class="banner">
     <h3>automatic notice: it's close to the start/end of the day, so the date is about to change, or maybe just did. don't get confused. look at the date. thanks.</h3>
 </div>
-{% endif %}
+{% endif -%}
 
-{% if show_banner == 2 %}
+{% if show_banner == 2 -%}
 <div class="banner zzbanner">
     <table width="100%" border="0" cellspacing="4" cellpadding="4">
         <tr>
             <td><img height="40px" src="https://101011010.com/schedimg/zzz.gif" alt="(zzz)"/></td>
-            <td><h3 >
+            <td>
+                <h3>
                 notice: it's pretty late. you should probably get some sleep. thanks for checking the schedule though :) now gn.
-            </h3></td>
+                </h3>
+            </td>
         </tr>
     </table>
 </div>
-{% endif %}
-
-{% for block in blocks %}
+{% endif -%}
+{% for block in blocks -%}
 <div class="block" style="background-color: {{block.bgcolorcode}}">
-
     <a class="heading" onclick="toggle_toki_reveal()">
         <h3>
             {{block.title}} ({{block.date}}) {% if block.is_over == true %} was {% else %} is {% endif %}
             <b>{{block.day_str}}</b>{# {% if block.is_online == true %}<span class="onl"> ONLINE</span>{% endif %} #}.
         </h3>
     </a>
-
-
-
-    {% if block.is_over == true %}
+    {% if block.is_over == true -%}
     <h4 class="onl">This day has already happened, at least in terms of school.</h4>
-    {% endif %}
-
-    {% if block.classes_is_some == true %}
+    {% endif -%}
+    {% if block.classes_is_some == true -%}
     {% set_global tokis = [
         " 8:00 - 9:00",
         " 9:05-10:05",
@@ -206,34 +197,28 @@
         "12:35-13:35",
         "13:40-14:40",
         "14:45-15:45"
-        ]
-    %}
+        ] -%}
     <p>This day's classes are:</p>
     <ol>
-        {% for class in block.classes %}
+        {% for class in block.classes -%}
         <li>{{class}} <span class="toki" style="color:{{block.bgcolorcode}}">{{tokis[loop.index0]}} </span></li>
-        {% endfor %}
-    </ol>
-    {% endif %}
-
-    {% if block.special_is_some == true %}
+        {% endfor -%}
+    </ol>{% endif -%}
+    {% if block.special_is_some == true -%}
     <div class="special">
         <p><em>Special events!</em></p>
         <ul>
-            {% for event in block.special %}
+            {% for event in block.special -%}
             <li>{{event}}</li>
-            {% endfor %}
+            {% endfor -%}
         </ul>
-    </div>
-    {% endif %}
+    </div>{% endif -%}
     <p class="greeting">{{block.greeting}}</p>
 </div>
-{% endfor %}
-
+{% endfor -%}
 <br />
 <br />
 <br />
-
 <a class="nexta" href="?count={{nextcount}}">Click here to load more days!</a>
 <br />
 <br />
@@ -247,6 +232,5 @@
 <br />
 <br />
 <br />
-
 </body>
 </html>
