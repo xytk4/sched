@@ -14,8 +14,16 @@
             /* font-family: "MS PGothic", serif, enable_if_you_want; */
         }
 
-        a {
+        a.nexta {
             font-size: x-large;
+        }
+
+        a.heading{
+            text-decoration: none;
+        }
+        a.heading:active {
+            text-decoration: none;
+            color: #ff6f00;
         }
 
         a:link {
@@ -57,15 +65,7 @@
         }
 
         .zzbanner {
-            width:75%;
-            background-color: #2554C7 ;
-            padding: 16px;
-            margin-left: var(--margin-left);
-            margin-top: var(--margin-top);
-            max-width: var(--block-width);
-            border-color: #444444;
-            border-width: 2px;
-            border-style: ridge;
+            background-color: #2554C7 !important;
         }
 
         .block {
@@ -80,25 +80,13 @@
             border-style: ridge;
         }
         .sched_day_tmr {
-             background-color: #357968;
-             width:50%;
-             margin: 2em;
-             padding: 1em;
-         }
+            background-color: #357968;
+            width:50%;
+            margin: 2em;
+            padding: 1em;
+        }
         .sched_day_datmr {
             background-color: #5b140b;
-            /* colour theory, ignore this this is just for testing
-            background-color: #6a4823;
-            background-color: #296a33;
-            background-color: #2f6a5f;
-            background-color: #29556a;
-            background-color: #3d386a;
-            background-color: #6a3a62;
-            background-color: #6a2c32;
-            background-color: #56617a;
-            background-color: #549ac6;
-            background-color: #c68252;
-            */
             width:50%;
             margin: 2em;
             padding: 1em;
@@ -134,7 +122,31 @@
         li:nth-child(5) {
             opacity: 56.666%;
         }
+        .toki {
+            float: right;
+        }
+        ol {
+            width: 38%;
+        }
     </style>
+
+    <script>
+        // ew, js
+        var tvi = false;
+        function toggle_toki_reveal() {
+            var tokis = document.getElementsByClassName("toki");
+            for (let i = 0; i<tokis.length; i++) {
+                let elem = tokis[i];
+                if (tvi) {
+                    elem.style.color = elem.parentElement.parentElement.parentElement.style.backgroundColor;
+                } else {
+                    elem.style.color = "rgb(255,255,255)";
+                }
+            }
+            tvi = !tvi;
+        }
+    </script>
+
 </head>
 <body>
 <h2>Hello and welcome to the automatic schedule webpage!</h2>
@@ -157,7 +169,7 @@
 {% endif %}
 
 {% if show_banner == 2 %}
-<div class="zzbanner">
+<div class="banner zzbanner">
     <table width="100%" border="0" cellspacing="4" cellpadding="4">
         <tr>
             <td><img height="40px" src="https://101011010.com/schedimg/zzz.gif" alt="(zzz)"/></td>
@@ -171,32 +183,47 @@
 
 {% for block in blocks %}
 <div class="block" style="background-color: {{block.bgcolorcode}}">
-    <h3>
-        {{block.title}} ({{block.date}}) {% if block.is_over == true %} was {% else %} is {% endif %}
-        <b>{{block.day_str}}</b>{# {% if block.is_online == true %}<span class="onl"> ONLINE</span>{% endif %} #}.
-    </h3>
+
+    <a class="heading" onclick="toggle_toki_reveal()">
+        <h3>
+            {{block.title}} ({{block.date}}) {% if block.is_over == true %} was {% else %} is {% endif %}
+            <b>{{block.day_str}}</b>{# {% if block.is_online == true %}<span class="onl"> ONLINE</span>{% endif %} #}.
+        </h3>
+    </a>
+
+
 
     {% if block.is_over == true %}
     <h4 class="onl">This day has already happened, at least in terms of school.</h4>
     {% endif %}
 
     {% if block.classes_is_some == true %}
+    {% set_global tokis = [
+        " 8:00 - 9:00",
+        " 9:05-10:05",
+        "10:25-11:25",
+        "11:30-12:30",
+        "12:35-13:35",
+        "13:40-14:40",
+        "14:45-15:45"
+        ]
+    %}
     <p>This day's classes are:</p>
     <ol>
         {% for class in block.classes %}
-            <li>{{class}}</li>
+        <li>{{class}} <span class="toki" style="color:{{block.bgcolorcode}}">{{tokis[loop.index0]}} </span></li>
         {% endfor %}
     </ol>
     {% endif %}
 
     {% if block.special_is_some == true %}
     <div class="special">
-    <p><em>Special events!</em></p>
-    <ul>
-        {% for event in block.special %}
+        <p><em>Special events!</em></p>
+        <ul>
+            {% for event in block.special %}
             <li>{{event}}</li>
-        {% endfor %}
-    </ul>
+            {% endfor %}
+        </ul>
     </div>
     {% endif %}
     <p class="greeting">{{block.greeting}}</p>
