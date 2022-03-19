@@ -7,8 +7,16 @@ use serde::{Deserialize, Serialize};
 
 const SPECIALS_PATH: &str = "./special.csv";
 const ONLINE_PATH:   &str = "./online.csv";
+const LOOKUP_PATH:   &str = "./lookup.csv";
 const SCHED_CLASSES: &str = include_str!("sched_classes.csv");
 const SCHED_DATA:    &str = include_str!("sched_data_11.csv");
+
+#[derive(Serialize, Deserialize, Debug)]
+enum BlockStatus {
+    NotStarted = 0,
+    Normal = 1,
+    IsOver = 2,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Block {
@@ -22,19 +30,20 @@ pub struct Block {
     classes_is_some: bool,
     special: Vec<String>,
     special_is_some: bool,
-    is_over: bool,
+    status: i32,
     //is_online: bool,
 }
 
 impl Block {
-    pub fn generate(dt: DateTime<Local>, title: &str) -> Self {
+    pub fn generate(dt: DateTime<Local>, now: DateTime<Local>, title: &str) -> Self {
         // what day is it? etc
         let date = dt.naive_local().date();
 
         let day = Self::day_from_date(&date);
-        let day_str = Self::format_day(&day);
+        let mut day_str = Self::format_day(&day);
 
-        let classes = match &day {
+
+        let mut classes = match &day {
             Some(d) => Self::classes_from_day(d),
             None => None,
         };
@@ -75,7 +84,7 @@ impl Block {
                             classes_is_some: false,
                             special: special.unwrap_or_default(),
                             special_is_some: false,
-                            is_over: false,
+                            status: BlockStatus::Normal as i32,
                             //is_online
                         }
                     },
@@ -93,7 +102,7 @@ impl Block {
                             classes_is_some: false,
                             special: special.unwrap_or_default(),
                             special_is_some: false,
-                            is_over: false,
+                            status: BlockStatus::Normal as i32,
                             //is_online
                         }
                     },
@@ -104,7 +113,7 @@ impl Block {
         }
 
 
-        let is_over = match &day {
+        let status = match &day {
             Some(d) => {
                 match d {
                     Day::Day1 |
@@ -115,40 +124,64 @@ impl Block {
                     Day::Day6 |
                     Day::Day7 |
                     Day::Day8 => {
-                        if dt.hour() >= 16
-                            && dt.naive_local().date() == chrono::Local::now().naive_local().date() {
-                            true
+                        if dt.hour() < 8
+                            && dt.naive_local().date() == now.naive_local().date() {
+                            BlockStatus::NotStarted
+                        } else if dt.hour() >= 16
+                            && dt.naive_local().date() == now.naive_local().date() {
+                            BlockStatus::IsOver
                         } else {
-                            false
+                            BlockStatus::Normal
                         }
                     }
                     Day::Day9 => {
-                        if dt.hour() >= 13 // safe estimates
-                            && dt.naive_local().date() == chrono::Local::now().naive_local().date() {
-                            true
+                        if dt.hour() < 8
+                            && dt.naive_local().date() == now.naive_local().date() {
+                            BlockStatus::NotStarted
+                        } else if dt.hour() >= 13 // safe estimates
+                            && dt.naive_local().date() == now.naive_local().date() {
+                            BlockStatus::IsOver
                         } else {
-                            false
+                            BlockStatus::Normal
                         }
                     }
                     Day::Ped |
                     Day::Holiday |
                     Day::HolidayDontCount |
                     Day::Weekend |
-                    Day::Unknown => false // not over, it never started
+                    Day::Unknown => BlockStatus::Normal // not over, it never started
                 }
             },
-            None => false
+            None => BlockStatus::Normal
         };
 
+
+        // alter
+        let mut bgcolorcode = "#2b3032".to_string();
+        match classes {
+            Some(x) => {
+                let alter = LookupAlter::alter(&date, x).unwrap();
+                classes = Some(alter.html()); // やべ
+                if let Some(c) = alter.ctd {
+                    day_str = c;
+                }
+                bgcolorcode = if let Some(ctdc) = alter.ctdcolor {
+                    ctdc
+                } else {
+                    match &day {
+                        Some(d) => Self::bgcolorcode(d),
+                        None => "#2b3032".to_string() // default
+                    }
+                }
+            }
+            None => {}
+        }
 
         // generate struct
         Block {
             date: date.format("%A, %d-%b-%Y").to_string(),
             title: title.to_string(),
-            bgcolorcode: match &day {
-                Some(d) => Self::bgcolorcode(d),
-                None => "#2b3032".to_string() // default
-            },
+            bgcolorcode,
             greeting:   if title == "Today" {
                             "I hope you have a nice day.".to_string()
                         } else {
@@ -160,7 +193,7 @@ impl Block {
             classes_is_some,
             special: special.unwrap_or_default(),
             special_is_some,
-            is_over,
+            status: status as i32,
             //is_online
         }
     }
@@ -392,4 +425,78 @@ pub enum Day {
     HolidayDontCount,
     Weekend,
     Unknown
+}
+
+struct LookupAlter {
+    pub classes: Vec<String>,
+    pub ctd: Option<String>,
+    pub ctdcolor: Option<String>,
+}
+
+impl LookupAlter {
+    pub fn alter(date: &NaiveDate, classes: Vec<String>) -> Result<Self, ()> {
+        let mut reader = match csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_path(LOOKUP_PATH)
+        {
+            Ok(r) => r,
+            Err(_) => return Err(()),
+        };
+        let date_str = date.format("%d-%m-%Y").to_string();
+
+        let mut newclasses = classes.clone();
+        let mut ctd = ""; // "change the day"
+        let mut ctdcolor = "";
+
+        for r in reader.records() {
+            let record = r.unwrap_or_default();
+            if record.get(0).unwrap_or_default() == date_str {
+                let r1 = record.get(1).unwrap_or_default();
+                let p = r1.parse::<usize>();
+                if p.is_ok() {
+                    newclasses[p.unwrap() - 1] = "$".to_owned() + record.get(2).unwrap_or_default();
+                } else if r1 == "CTD" {
+                    match record.get(2) {
+                        Some(x) => {
+                            match x {
+                                "ProductionWeek" => {
+                                    for (i, class) in classes.iter().enumerate() {
+                                        if !(class == "Chant" || class == "Instro" || class == "Lunch") {
+                                            newclasses[i] = " ".to_string();
+                                        }
+                                    }
+                                    ctd = "a Production Day";
+                                    ctdcolor = "#4e94af";
+                                },
+                                "ProductionWeekShow" => {
+                                    ctd = "a Show!";
+                                    ctdcolor = "#cb762d";
+                                }
+                                _ => {}
+                            }
+                        }
+                        None => {}
+                    }
+                }
+            }
+        }
+
+        Ok(Self {
+            classes: newclasses,
+            ctd: if ctd == "" {None} else {Some(ctd.to_string())},
+            ctdcolor: if ctdcolor == "" {None} else {Some(ctdcolor.to_string())} //4e94af
+        })
+    }
+
+    pub fn html(&self) -> Vec<String> {
+        let mut htmlclasses: Vec<String> = vec![];
+        for class in &self.classes {
+            if class.starts_with("$") { // ya ok this kinda sucks
+                htmlclasses.push(format!("<b><i>{}</i></b>", class.trim_matches('$')));
+            } else {
+                htmlclasses.push(class.to_string());
+            }
+        }
+        htmlclasses
+    }
 }

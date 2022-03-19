@@ -124,7 +124,20 @@
         }
 
         ol {
-            width:45%;
+            width:52%;
+        }
+
+        @media only screen and (hover: none) and (pointer: coarse) {
+            ol {
+                font-size: 25px; /* おねがいいいい */
+                width:60%;
+            }
+        }
+
+        ul.c { list-style-type: '\2713 '; }
+
+        .timetravel {
+            color: #F00;
         }
     </style>
 
@@ -157,6 +170,17 @@
     <br/>
     (1 more thing - if there is a mistake / something that should be added ; just lmk and i'll fix it.)
 </div>
+
+{% if timetravel == 1 -%}
+<div class="timetravel onl">
+    <h2>warning! you are time travelling! be careful!</h2>
+</div>
+{% elif timetravel == 2 -%}
+<div class="timetravel onl">
+    <h2>warning! you <em>tried</em> to time travel, but it failed! be careful!!</h2>
+</div>
+{% endif -%}
+
 {% if show_banner == 1 -%}
 <div class="banner">
     <h3>automatic notice: it's close to the start/end of the day, so the date is about to change, or maybe just did. don't get confused. look at the date. thanks.</h3>
@@ -181,11 +205,18 @@
 <div class="block" style="background-color: {{block.bgcolorcode}}">
     <a class="heading" onclick="toggle_toki_reveal()">
         <h3>
-            {{block.title}} ({{block.date}}) {% if block.is_over == true %} was {% else %} is {% endif %}
+            {{block.title}} ({{block.date}})
+            {% if block.status == 0 %}
+            will be
+            {% elif block.status == 1 %}
+            is
+            {% elif block.status == 2 %}
+            was
+            {% endif %}
             <b>{{block.day_str}}</b>{# {% if block.is_online == true %}<span class="onl"> ONLINE</span>{% endif %} #}.
         </h3>
     </a>
-    {% if block.is_over == true -%}
+    {% if block.status == 2 -%}
     <h4 class="onl">This day has already happened, at least in terms of school.</h4>
     {% endif -%}
     {% if block.classes_is_some == true -%}

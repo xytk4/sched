@@ -2,9 +2,8 @@
 // stupid statistics module
 // idk if i will even use this
 
-use chrono::{DateTime, Local, NaiveDate, Timelike};
+use chrono::{DateTime, Local, NaiveDate};
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
 
 const SCHED_DATA: &str = include_str!("sched_data_11.csv");
 

@@ -2,7 +2,7 @@
 
 #[macro_use] extern crate rocket;
 
-use chrono::{Duration, Timelike, NaiveDate, DateTime, Local, TimeZone};
+use chrono::{Duration, Timelike, NaiveDate, Local, TimeZone, NaiveDateTime, Datelike};
 use rocket_contrib::templates::Template;
 use crate::blocks::{Block, Day};
 use crate::stat::*;
@@ -18,7 +18,8 @@ struct TemplateContext<'r> {
     show_banner: &'r i32,
     nextcount: &'r i32,
     benchmark_duration_ms: &'r f64,
-    benchmark_stat_pct: &'r String
+    benchmark_stat_pct: &'r String,
+    timetravel: &'r i32,
 }
 
 #[derive(serde::Serialize)]
@@ -26,8 +27,14 @@ struct SillyTemplateContext<'r> {
     count: &'r i32,
 }
 
-#[get("/sched?<count>")]
-fn sched(count: Option<i32>) -> Template {
+enum TimeTravel {
+    False = 0,
+    True = 1,
+    Failed = 2
+}
+
+#[get("/sched?<count>&<dt>")]
+fn sched(count: Option<i32>, dt: Option<String>) -> Template {
     // first, prevent silly nonsense like requesting a BILLION things
     match count {
         Some(c) => {
@@ -43,7 +50,27 @@ fn sched(count: Option<i32>) -> Template {
     let benchmark_dt_start = chrono::Local::now();
 
     // figure it out
-    let now = chrono::Local::now();
+    let mut timetravel = TimeTravel::False;
+    let now = if dt.is_some() {
+        let date_p = NaiveDateTime::parse_from_str(dt.unwrap().as_str(), "%d-%m-%Y-%H-%M-%S");
+        if date_p.unwrap().year() < 2020 { // easy mistake to make
+            timetravel = TimeTravel::Failed;
+            chrono::Local::now()
+        } else {
+            match date_p {
+                Ok(d) => {
+                    timetravel = TimeTravel::True;
+                    Local.from_local_datetime(&d).unwrap()
+                },
+                Err(_) => {
+                    timetravel = TimeTravel::Failed;
+                    chrono::Local::now()
+                } // bad!
+            }
+        }
+    } else {
+        chrono::Local::now()
+    };
 
     /*let show_banner = match now.hour() {
         22 | 23 | 24 | 0 | 1 | 2 => true, // good enough for me
@@ -67,10 +94,10 @@ fn sched(count: Option<i32>) -> Template {
 
 
     let mut bks= vec![
-        blocks::Block::generate(now, "Today"),
-        blocks::Block::generate(now + Duration::days(1), "Tomorrow"),
-        blocks::Block::generate(now + Duration::days(2), "Day after tomorrow"),
-        blocks::Block::generate(now + Duration::days(3), "Day after day after tomorrow"),
+        blocks::Block::generate(now, now, "Today"),
+        blocks::Block::generate(now + Duration::days(1), now, "Tomorrow"),
+        blocks::Block::generate(now + Duration::days(2), now, "Day after tomorrow"),
+        blocks::Block::generate(now + Duration::days(3), now, "Day after day after tomorrow"),
     ];
 
     // let's try this
@@ -78,7 +105,7 @@ fn sched(count: Option<i32>) -> Template {
         Some(c) => {
             for i in 4..=c {
                 // oh hell yeah that's what i'm talking about
-                bks.push(blocks::Block::generate(now + Duration::days(i as i64), ""))
+                bks.push(blocks::Block::generate(now + Duration::days(i as i64), now, ""))
             }
         }
         None => {}
@@ -102,7 +129,8 @@ fn sched(count: Option<i32>) -> Template {
             None => 10,
         },
         benchmark_duration_ms: &benchmark_duration_ms,
-        benchmark_stat_pct: &format!("{:.3}", benchmark_stat_pct)
+        benchmark_stat_pct: &format!("{:.3}", benchmark_stat_pct),
+        timetravel: &(timetravel as i32),
     })
 }
 
