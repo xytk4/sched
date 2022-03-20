@@ -174,7 +174,12 @@ impl Block {
                     }
                 }
             }
-            None => {}
+            None => {
+                bgcolorcode = match &day {
+                    Some(d) => Self::bgcolorcode(d),
+                    None => "#2b3032".to_string() // default
+                }
+            }
         }
 
         // generate struct
