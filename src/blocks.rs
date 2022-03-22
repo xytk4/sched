@@ -476,7 +476,11 @@ impl LookupAlter {
                                 "ProductionWeekShow" => {
                                     ctd = "a Show!";
                                     ctdcolor = "#cb762d";
-                                }
+                                },
+				"Fasho" => {
+				    ctd = "the Fashion Show!";
+				    ctdcolor = "#c65454";
+				},
                                 _ => {}
                             }
                         }
