@@ -157,30 +157,19 @@ impl Block {
 
 
         // alter
-        let mut bgcolorcode = "#2b3032".to_string();
-        match classes {
-            Some(x) => {
-                let alter = LookupAlter::alter(&date, x).unwrap();
-                classes = Some(alter.html()); // やべ
-                if let Some(c) = alter.ctd {
-                    day_str = c;
-                }
-                bgcolorcode = if let Some(ctdc) = alter.ctdcolor {
-                    ctdc
-                } else {
-                    match &day {
-                        Some(d) => Self::bgcolorcode(d),
-                        None => "#2b3032".to_string() // default
-                    }
-                }
-            }
-            None => {
-                bgcolorcode = match &day {
-                    Some(d) => Self::bgcolorcode(d),
-                    None => "#2b3032".to_string() // default
-                }
-            }
+        let alter = LookupAlter::alter(&date, classes).unwrap();
+        classes = alter.html(); // やべ x2
+        if let Some(c) = alter.ctd {
+            day_str = c;
         }
+        let bgcolorcode = if let Some(ctdc) = alter.ctdcolor {
+            ctdc
+        } else {
+            match &day {
+                Some(d) => Self::bgcolorcode(d),
+                None => "#2b3032".to_string() // default
+            }
+        };
 
         // generate struct
         Block {
@@ -433,13 +422,13 @@ pub enum Day {
 }
 
 struct LookupAlter {
-    pub classes: Vec<String>,
+    pub classes: Option<Vec<String>>,
     pub ctd: Option<String>,
     pub ctdcolor: Option<String>,
 }
 
 impl LookupAlter {
-    pub fn alter(date: &NaiveDate, classes: Vec<String>) -> Result<Self, ()> {
+    pub fn alter(date: &NaiveDate, classes: Option<Vec<String>>) -> Result<Self, ()> {
         let mut reader = match csv::ReaderBuilder::new()
             .has_headers(false)
             .from_path(LOOKUP_PATH)
@@ -449,7 +438,7 @@ impl LookupAlter {
         };
         let date_str = date.format("%d-%m-%Y").to_string();
 
-        let mut newclasses = classes.clone();
+        let mut newclasses = classes.clone().unwrap_or_default();
         let mut ctd = ""; // "change the day"
         let mut ctdcolor = "";
 
@@ -458,14 +447,14 @@ impl LookupAlter {
             if record.get(0).unwrap_or_default() == date_str {
                 let r1 = record.get(1).unwrap_or_default();
                 let p = r1.parse::<usize>();
-                if p.is_ok() {
+                if p.is_ok() && classes.is_some() {
                     newclasses[p.unwrap() - 1] = "$".to_owned() + record.get(2).unwrap_or_default();
                 } else if r1 == "CTD" {
                     match record.get(2) {
                         Some(x) => {
                             match x {
                                 "ProductionWeek" => {
-                                    for (i, class) in classes.iter().enumerate() {
+                                    for (i, class) in classes.clone().unwrap().iter().enumerate() {
                                         if !(class == "Chant" || class == "Instro" || class == "Lunch") {
                                             newclasses[i] = " ".to_string();
                                         }
@@ -477,10 +466,10 @@ impl LookupAlter {
                                     ctd = "a Show!";
                                     ctdcolor = "#cb762d";
                                 },
-				"Fasho" => {
-				    ctd = "the Fashion Show!";
-				    ctdcolor = "#c65454";
-				},
+                                "Fasho" => {
+                                    ctd = "the Fashion Show!";
+                                    ctdcolor = "#c65454";
+                                },
                                 _ => {}
                             }
                         }
@@ -491,21 +480,24 @@ impl LookupAlter {
         }
 
         Ok(Self {
-            classes: newclasses,
+            classes: if classes.is_some() {Some(newclasses)} else {None},
             ctd: if ctd == "" {None} else {Some(ctd.to_string())},
             ctdcolor: if ctdcolor == "" {None} else {Some(ctdcolor.to_string())} //4e94af
         })
     }
 
-    pub fn html(&self) -> Vec<String> {
+    pub fn html(&self) -> Option<Vec<String>> {
+        if self.classes.is_none() {
+            return None
+        }
         let mut htmlclasses: Vec<String> = vec![];
-        for class in &self.classes {
+        for class in self.classes.as_ref().unwrap() {
             if class.starts_with("$") { // ya ok this kinda sucks
                 htmlclasses.push(format!("<b><i>{}</i></b>", class.trim_matches('$')));
             } else {
                 htmlclasses.push(class.to_string());
             }
         }
-        htmlclasses
+        Some(htmlclasses)
     }
 }
