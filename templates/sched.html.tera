@@ -168,8 +168,6 @@
     Ped days / holidays remaining: </span>{{stat.ped_rem}} <span class="bleh">(</span>{{stat.ped_past}} <span class="bleh">have happened already)</span><br/>
     That's it, have a nice day! <i> (calculated in {{stat.time_ms}}ms) </i><br/>
     <br/>
-    <b>!! now featuring 95% production-week-era schedule compliance !!</b>
-    (look for the periods in <b><i>bold</i></b>)
 </div>
 
 {% if timetravel == 1 -%}

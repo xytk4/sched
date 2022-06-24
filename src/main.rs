@@ -38,7 +38,7 @@ fn sched(count: Option<i32>, dt: Option<String>) -> Template {
     // first, prevent silly nonsense like requesting a BILLION things
     match count {
         Some(c) => {
-            if c > 80 {
+            if c > 160 {
                 return Template::render("silly", &SillyTemplateContext {
                     count: &c
                 })

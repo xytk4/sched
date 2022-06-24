@@ -149,6 +149,7 @@ impl Block {
                     Day::Holiday |
                     Day::HolidayDontCount |
                     Day::Weekend |
+                    Day::Exam | Day::NoExam | 
                     Day::Unknown => BlockStatus::Normal // not over, it never started
                 }
             },
@@ -197,9 +198,11 @@ impl Block {
             Day::Holiday |
             Day::HolidayDontCount |
             Day::Weekend |
+            Day::NoExam |
             Day::Unknown => {
                 return None;
-            }
+            },
+            Day::Exam => {return Some(vec![" ".to_string()])},
             _ => {}
         }
 
@@ -258,6 +261,8 @@ impl Block {
                             "C" => Day::Holiday,
                             "D" => Day::HolidayDontCount,
                             "W" => Day::Weekend,
+                            "E" => Day::Exam,
+"N" => Day::NoExam,
                             _ => Day::Unknown,
                         }
                     );
@@ -345,9 +350,11 @@ impl Block {
                 Day::Holiday | Day::HolidayDontCount
                     => "a Holiday of Some Sort, idk look it up in the calendar",
                 Day::Weekend => "the weekend",
+Day::Exam => "an Exam Day",
+Day::NoExam => "an Exam-free Day",
                 Day::Unknown => "unknown ???",
             }.to_string(),
-            None => "no day (this is probably an error!!)".to_string(),
+            None => "no day".to_string(),
         }
     }
 
@@ -366,6 +373,8 @@ impl Block {
             Day::Ped => "#549ac6",
             Day::Holiday | Day::HolidayDontCount => "#c68252",
             Day::Weekend => "#2b3032",
+            Day::Exam => "#39b938",
+            Day::NoExam => "#4e88a3",
             Day::Unknown => "#FF0000", // should never see this
         }.to_string()
     }
@@ -418,6 +427,8 @@ pub enum Day {
     Holiday,
     HolidayDontCount,
     Weekend,
+    Exam,
+    NoExam,
     Unknown
 }
 
@@ -463,7 +474,12 @@ impl LookupAlter {
                                     ctdcolor = "#4e94af";
                                 },
                                 "ProductionWeekShow" => {
-                                    ctd = "a Show!";
+                                    for (i, class) in classes.clone().unwrap().iter().enumerate() {
+					if !(class == "Lunch" || (class == "Instro" && i<4)) {
+						newclasses[i] = " ".to_string();
+}
+}
+				    ctd = "a Show!";
                                     ctdcolor = "#cb762d";
                                 },
                                 "Fasho" => {
